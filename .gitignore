@@ -1,0 +1,10 @@
+node_modules/
+backend/node_modules/
+dist/
+.env
+backend/.env
+*.dump
+*.dump.sha256
+QA-NAVEGADOR.json
+test-results/
+__pycache__/

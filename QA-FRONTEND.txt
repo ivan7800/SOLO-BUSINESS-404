@@ -1,0 +1,61 @@
+
+> solo-business-404@0.9.7 test
+> node --test tests/*.test.mjs
+
+✔ NIF y NIE con checksum; CIF de ejemplo y datos inválidos (2.144963ms)
+✔ Alta y edición conservan identidad y relaciones (37.649486ms)
+✔ Borrado de clientes sin vínculos y entradas inválidas (0.550818ms)
+✔ Snapshots previos sin nuevos campos mantienen compatibilidad (0.508019ms)
+✔ no implicit deletes against an empty acknowledged baseline (3.179981ms)
+✔ delete requires the exact acknowledged revision (0.784198ms)
+✔ changed remote revision prevents deletion (0.871415ms)
+✔ tombstones cannot trigger new deletion (0.449451ms)
+✔ totales multitramos (3.137082ms)
+✔ normalización (1.358592ms)
+✔ no acepta descuento imposible (0.728549ms)
+✔ no acepta vencimiento vacío (0.500083ms)
+✔ compatible con registros SIM anteriores (0.297852ms)
+✔ reject no baseline (2.137284ms)
+✔ allow unchanged revisions (0.480117ms)
+✔ reject updated remote record (0.383549ms)
+✔ reject deleted remote record (0.277194ms)
+✔ reject new record not in reviewed baseline (0.285982ms)
+✔ empty server creates all rows (5.033274ms)
+✔ same server rows produce no actions (26.677951ms)
+✔ changed record receives optimistic revision (0.6427ms)
+✔ malformed remote record rejected (1.420356ms)
+✔ Horas y materiales: cálculo de costes y margen (26.19732ms)
+✔ Edición, avance, cierre y reapertura de trabajo (1.497147ms)
+✔ Eliminación de partes y validación estricta de importación (0.8545ms)
+✔ Snapshot heredado sin entries ni budget (1.115272ms)
+✔ No se oculta una escritura local fallida y se recupera el estado del error (39.825133ms)
+✔ No intenta persistencia local durante modo remoto (0.751033ms)
+✔ Cálculo de descuentos e IVA por línea (1.58848ms)
+✔ Rechaza importes inválidos y líneas vacías (0.63813ms)
+✔ Alta, edición, transición y conversión única en trabajo (33.636358ms)
+✔ modo remoto no sobrescribe copia local y vuelve al modo local explícitamente (22.688987ms)
+✔ Datos JSON dañados permanecen intactos hasta restauración explícita (26.249705ms)
+✔ Error leyendo storage bloquea escritura automática (0.562281ms)
+✔ Carga fixtures y calcula totales (1.995322ms)
+✔ Añadir cliente y restaurar estado (18.949402ms)
+✔ Presupuesto: alta y transición controlada (1.040293ms)
+✔ Trabajos y tareas guardan estados (0.680839ms)
+✔ Cobros parciales no admiten excesos ni borradores (0.651102ms)
+✔ Exportar e importar esquema demo (0.84717ms)
+✔ Escape HTML en cadenas externas (0.313ms)
+✔ Importaciones malformadas no rompen el renderizado (0.658716ms)
+✔ recuperación remota ignora borrados lógicos aunque API devuelva su payload (4.313515ms)
+✔ una tumba lógica impide recrear por sincronización accidental (2.566329ms)
+✔ borrado remoto combinado con otros registros conserva los activos (1.347294ms)
+✔ No admite fechas normalizadas al mes siguiente (4.087379ms)
+✔ Importes inválidos no se convierten silenciosamente en cero (0.655309ms)
+✔ Registros creados siguen siendo restaurables (39.802299ms)
+✔ La etiqueta lateral y la guía coinciden con package.json (0.71913ms)
+ℹ tests 49
+ℹ suites 0
+ℹ pass 49
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 478.235664

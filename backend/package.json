@@ -1,0 +1,14 @@
+{
+  "name": "solo-business-404-api",
+  "version": "0.9.7",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test test/*.test.mjs",
+    "test:e2e": "node test/e2e-postgres.mjs"
+  },
+  "dependencies": {
+    "pg": "^8.13.1"
+  }
+}

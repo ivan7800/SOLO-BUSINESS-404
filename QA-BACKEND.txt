@@ -1,0 +1,47 @@
+
+> solo-business-404-api@0.9.7 test
+> node --test test/*.test.mjs
+
+✔ HTTP body enforces byte limit (1.73806ms)
+✔ rate limit exact (1.342934ms)
+✔ rate limit reset (0.335005ms)
+✔ record limits (0.364511ms)
+✔ origin exact (0.184391ms)
+✔ seven collections (1.394404ms)
+✔ preserves original identifiers and all kinds (1.354735ms)
+✔ reject duplicate identifiers in same collection (0.716578ms)
+✔ reject missing collection (0.256927ms)
+✔ reject oversized record (1.153204ms)
+✔ reject oversized dataset (10.31247ms)
+✔ reject mismatched source identifiers (1.369688ms)
+✔ accept matching source identifiers (0.19202ms)
+✔ acepta alta validada (1.716626ms)
+✔ rechaza duplicados (0.432802ms)
+✔ requiere revision para actualizacion (0.277861ms)
+✔ rechaza entidades desconocidas (0.227928ms)
+✔ requiere carga en altas (0.845344ms)
+✔ limita lote (0.191487ms)
+✔ restore rejects unset connection URL (6.763071ms)
+✔ restore rejects missing confirmation (4.117788ms)
+✔ restauracion exige checksum (0.818278ms)
+✔ restauracion rechaza destino no vacio (0.187562ms)
+✔ restauracion restringida a base test (0.107839ms)
+✔ restauracion transaccional (0.089472ms)
+✔ contraseña y sal aleatoria (157.026858ms)
+✔ rechazar contraseña débil (0.33253ms)
+✔ tokens aleatorios y hash (0.64444ms)
+✔ tipos permitidos (0.113901ms)
+✔ borrado requiere revisión positiva (1.667474ms)
+✔ borrado lógico conserva la revisión (0.84001ms)
+✔ los registros borrados no pueden actualizarse (0.347677ms)
+✔ la lectura de sincronización incluye lápidas (0.20376ms)
+✔ escrituras heredadas deshabilitadas (0.122953ms)
+✔ migración incluye marca de borrado (0.140228ms)
+ℹ tests 35
+ℹ suites 0
+ℹ pass 35
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 381.030121

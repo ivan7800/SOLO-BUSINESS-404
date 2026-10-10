@@ -1,0 +1,23 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: solo_test
+      POSTGRES_PASSWORD: ${SOLO_TEST_PASSWORD:-solo_local_tests_only}
+      POSTGRES_DB: solo_business_test
+    ports:
+      - "127.0.0.1:55432:5432"
+    volumes:
+      - solo_pg_test:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./migration_v064.sql:/docker-entrypoint-initdb.d/02-v064.sql:ro
+      - ./migration_v065.sql:/docker-entrypoint-initdb.d/03-v065.sql:ro
+      - ./migration_v067.sql:/docker-entrypoint-initdb.d/04-v067.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U solo_test -d solo_business_test"]
+      interval: 2s
+      timeout: 3s
+      retries: 25
+volumes:
+  solo_pg_test:

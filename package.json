@@ -1,0 +1,17 @@
+{
+  "name": "solo-business-404",
+  "version": "0.9.7",
+  "private": true,
+  "type": "module",
+  "description": "Prototipo navegable local-first de gestión de autónomos, sin facturación fiscal",
+  "scripts": {
+    "dev": "python -m http.server 4173 --bind 127.0.0.1",
+    "test": "node --test tests/*.test.mjs",
+    "test:browser": "node tests/browser-e2e.mjs",
+    "build:pages": "node scripts/build-pages.mjs"
+  },
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "playwright": "1.58.2"
+  }
+}

@@ -1,0 +1,23 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {createStore,invoiceTotal,kpis,validateSnapshot} from '../assets/js/store.js';
+import {seedData} from '../assets/js/data.js';
+import {escapeHtml} from '../assets/js/utils.js';
+const mockStorage=()=>{const memory=new Map();return {getItem:k=>memory.get(k)||null,setItem:(k,v)=>memory.set(k,v)};};
+test('Carga fixtures y calcula totales',()=>{const s=createStore(mockStorage());const d=s.get();assert.equal(d.clients.length,5);assert.equal(invoiceTotal(d.invoices.find(i=>i.id==='SIM-002')),459.8);assert.ok(kpis(d).pending>0);});
+test('Añadir cliente y restaurar estado',()=>{const storage=mockStorage();const s=createStore(storage);const c=s.addClient({name:'Ana Prueba',email:'ana@example.test'});assert.match(c.id,/^CL-/);assert.equal(s.get().clients.length,6);assert.equal(createStore(storage).get().clients.length,6);s.reset();assert.equal(s.get().clients.length,5);});
+test('Presupuesto: alta y transición controlada',()=>{const s=createStore(mockStorage());const q=s.addQuote({clientId:'CL-001',title:'Consultoría',subtotal:120,tax:21});assert.equal(q.status,'Borrador');s.setQuoteStatus(q.id,'Enviado');assert.equal(s.get().quotes[0].status,'Enviado');assert.throws(()=>s.setQuoteStatus(q.id,'Ilegal'),/Estado no permitido/);});
+test('Trabajos y tareas guardan estados',()=>{const s=createStore(mockStorage());const j=s.addJob({clientId:'CL-001',title:'Revisión',hours:3,rate:60});s.setJobStatus(j.id,'Completado');assert.equal(s.get().jobs[0].progress,100);const t=s.addTask({title:'Llamar',priority:'Alta'});s.toggleTask(t.id);assert.equal(s.get().tasks[0].done,true);});
+test('Cobros parciales no admiten excesos ni borradores',()=>{const s=createStore(mockStorage());s.recordDemoPayment('SIM-001',100);const inv=s.get().invoices.find(i=>i.id==='SIM-001');assert.equal(inv.paid,100);assert.throws(()=>s.recordDemoPayment('SIM-001',10000),/no superar el pendiente/);assert.throws(()=>s.recordDemoPayment('SIM-004',3),/Solo se pueden simular/);const pending=invoiceTotal(inv)-100;s.recordDemoPayment('SIM-001',pending);assert.equal(s.get().invoices.find(i=>i.id==='SIM-001').status,'Pagado');});
+test('Exportar e importar esquema demo',()=>{const s=createStore(mockStorage());const copy=JSON.parse(JSON.stringify(s.get()));s.addExpense({title:'Prueba',amount:19.99,category:'Otros'});s.restore(copy);assert.equal(s.get().expenses.length,4);assert.throws(()=>s.restore({}),/Versión/);const bad=seedData();bad.invoices[0].clientId='CL-DOES-NOT-EXIST';assert.throws(()=>validateSnapshot(bad),/desconocida/);});
+test('Escape HTML en cadenas externas',()=>{assert.equal(escapeHtml('<img src="x" onerror="bad()">'),'&lt;img src=&quot;x&quot; onerror=&quot;bad()&quot;&gt;');});
+test('Importaciones malformadas no rompen el renderizado',()=>{
+ const broken=seedData();broken.jobs[0].progress='100%;background:red';
+ assert.throws(()=>validateSnapshot(broken),/Trabajo importado inválido/);
+ const brokenDate=seedData();brokenDate.expenses[0].date='2026-02-31';
+ assert.throws(()=>validateSnapshot(brokenDate),/Gasto importado inválido/);
+ const duplicated=seedData();duplicated.clients[1].id=duplicated.clients[0].id;
+ assert.throws(()=>validateSnapshot(duplicated),/duplicado/);
+ const invalidMeta=seedData();invalidMeta.meta.theme='unexpected';
+ assert.throws(()=>validateSnapshot(invalidMeta),/Metadatos/);
+});

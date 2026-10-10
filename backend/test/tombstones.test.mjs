@@ -1,0 +1,12 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {validateOperations} from '../record-operations.mjs';
+const server=readFileSync(new URL('../server.mjs',import.meta.url),'utf8');
+const sql=readFileSync(new URL('../migration_v067.sql',import.meta.url),'utf8');
+test('borrado requiere revisión positiva',()=>assert.throws(()=>validateOperations({operations:[{kind:'clients',action:'delete',sourceId:'a',expectedRevision:0}]})));
+test('borrado lógico conserva la revisión',()=>{assert.match(server,/SET deleted_at=now\(\),revision=revision\+1/);assert.match(server,/deleted:op.action==='delete'/)});
+test('los registros borrados no pueden actualizarse',()=>assert.match(server,/AND deleted_at IS NULL RETURNING revision/));
+test('la lectura de sincronización incluye lápidas',()=>assert.match(server,/revision,payload,deleted_at FROM records/));
+test('escrituras heredadas deshabilitadas',()=>assert.match(server,/Ruta de escritura heredada deshabilitada/));
+test('migración incluye marca de borrado',()=>assert.match(sql,/ADD COLUMN IF NOT EXISTS deleted_at/));

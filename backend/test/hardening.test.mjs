@@ -1,0 +1,5 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {RateLimiter,validateRecord,isAllowedOrigin} from '../hardening.mjs';
+test('rate limit exact',()=>{let t=0;const l=new RateLimiter({limit:2,windowMs:100,now:()=>t});assert.equal(l.consume('a'),true);assert.equal(l.consume('a'),true);assert.equal(l.consume('a'),false);assert.equal(l.consume('b'),true);t=101;assert.equal(l.consume('a'),true)});
+test('rate limit reset',()=>{const l=new RateLimiter({limit:1});assert.equal(l.consume('a'),true);assert.equal(l.consume('a'),false);l.reset('a');assert.equal(l.consume('a'),true)});
+test('record limits',()=>{assert.equal(validateRecord({a:'x'}),true);assert.equal(validateRecord({a:'x'.repeat(17000)}),false);assert.equal(validateRecord([]),false);assert.equal(validateRecord(null),false)});
+test('origin exact',()=>{assert.equal(isAllowedOrigin('http://localhost:4173','http://localhost:4173'),true);assert.equal(isAllowedOrigin('http://evil.test','http://localhost:4173'),false)});

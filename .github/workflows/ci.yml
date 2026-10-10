@@ -1,0 +1,91 @@
+name: QA frontend and PostgreSQL
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: solo_business_test
+          POSTGRES_USER: solo_test
+          POSTGRES_PASSWORD: ci_local_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U solo_test -d solo_business_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgres://solo_test:ci_local_password@127.0.0.1:5432/solo_business_test
+      CONFIRM_ISOLATED_TEST_DB: YES
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Apply schema and migrations
+        run: |
+          for file in schema.sql migration_v064.sql migration_v065.sql migration_v067.sql; do
+            docker exec -i "$(docker ps -q --filter ancestor=postgres:16-alpine | head -1)" psql -v ON_ERROR_STOP=1 -U solo_test -d solo_business_test < "backend/$file"
+          done
+      - name: Frontend dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Frontend unit tests
+        run: npm test
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Build static Pages artifact
+        run: npm run build:pages
+      - name: Browser tests (desktop, mobile, repository subpath)
+        env:
+          SOLO_TEST_ROOT: dist
+        run: npm run test:browser
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - name: Backend dependencies
+        working-directory: backend
+        run: npm ci --no-audit --no-fund
+      - name: Backend unit tests
+        working-directory: backend
+        run: npm test
+      - name: PostgreSQL end-to-end tests
+        working-directory: backend
+        run: npm run test:e2e
+
+  restore:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Integration and backup restore
+        working-directory: backend
+        run: bash verify-real.sh
+      - name: Cleanup disposable database
+        if: always()
+        working-directory: backend
+        run: docker compose down -v
+  deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [tests, restore]
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/configure-pages@v5
+      - name: Publish
+        id: deployment
+        uses: actions/deploy-pages@v4
